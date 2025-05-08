@@ -16,7 +16,6 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const productData = req.body;
-    // Validate required fields
     const requiredFields = [
       'productName',
       'item',
@@ -34,6 +33,23 @@ router.post('/', async (req, res) => {
     const product = new Product(productData);
     await product.save();
     res.status(201).json(product);
+  } catch (err) {
+    res.status(400).json({ message: 'Invalid data', error: err.message });
+  }
+});
+
+// PUT update a product
+router.put('/:id', async (req, res) => {
+  try {
+    const productData = req.body;
+    const product = await Product.findByIdAndUpdate(req.params.id, productData, {
+      new: true,
+      runValidators: true,
+    });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json(product);
   } catch (err) {
     res.status(400).json({ message: 'Invalid data', error: err.message });
   }
