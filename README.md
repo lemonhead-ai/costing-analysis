@@ -1,77 +1,147 @@
-# Getting started with cost analysis web app.
-The application is supposed to work as a tool to calculate inputs in a company set up and output expectation results after a real application scenario.
-
-It employes use of react with node.js + express.js and mongodb Atlas for the database.
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm install`
-arsed to install node modules into the project directory.
-
-### `npm start`
-
-Runs the frontend part of the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-### `npm run dev`
-This will be run on the backend part of the app to ensure the server is running. 
-server will run on port 5000
 
 
-### `npm test`
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Plastify Cost Analysis Web App
 
-### `npm run build`
+A full-stack web application for managing and analyzing cost inputs and output expectations in a company setup. Ideal for manufacturing and production environments, this app helps track material costs, generate reports, raise alerts, and visualize profit margins.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Tech Stack
 
-### `npm run eject`
+- **Frontend:** React.js (with TailwindCSS)
+- **Backend:** Node.js + Express.js
+- **Database:** MongoDB Atlas (cloud)
+- **APIs & Utilities:** REST API, Mongoose, dotenv, nodemon
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Getting Started
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Clone the repository and install the dependencies for both frontend and backend.
 
-## Learn More
+### 1. Install Dependencies
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm install
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Installs all required node modules for both frontend and backend.
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+2. Run the App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Frontend (React)
 
-### Making a Progressive Web App
+npm start
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Runs the frontend in development mode.
 
-### Advanced Configuration
+Open http://localhost:3000 to view it in your browser.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+The page reloads on changes and shows lint errors in the console.
 
-### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Backend (Express Server)
 
-### `npm run build` fails to minify
+npm run dev
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Starts the backend Express server using nodemon.
+
+Server runs on port 5000 by default.
+
+Ensure .env has your correct MongoDB connection string.
+
+
+
+---
+
+Scripts
+
+Command	Description
+
+npm install	Installs node modules
+npm start	Starts the React frontend
+npm run dev	Starts the Express backend using nodemon
+npm run build	Builds the React app for production
+npm test	Runs frontend tests
+npm run eject	Ejects React config (advanced)
+
+
+
+---
+
+Folder Structure
+
+/plastify-costing-app
+│
+├── backend/              # Express backend
+│   ├── routes/           # API routes (e.g., products)
+│   ├── models/           # Mongoose schemas
+│   └── server.js         # Main backend server
+│
+├── src/                  # React frontend
+│   ├── components/       # Reusable UI components
+│   ├── pages/            # Page views (e.g., Dashboard)
+│   ├── App.js            # Main component
+│   └── index.js          # Entry point
+│
+├── public/               # Static files
+├── .env                  # Environment variables (not committed)
+├── README.md             # Project info
+└── package.json          # Scripts & metadata
+
+
+---
+
+Features
+
+Material Cost Entry: Add materials, costs, and quantities.
+
+Dynamic Calculations: Auto-updates margins and totals.
+
+Real-time Alerts: Get notified when costs spike or margins fall.
+
+Report Generator: Export downloadable reports (CSV/PDF).
+
+Download History: Track generated reports.
+
+Modern UI: Built with TailwindCSS for a responsive layout.
+
+Dark/Light Mode: Optional toggle.
+
+
+
+Environment Variables
+
+Create a .env file in your backend directory with the following:
+
+MONGO_URI=your_mongodb_atlas_connection_string
+PORT=5000
+
+
+
+Coming Soon
+
+User authentication (admin/user roles)
+
+Notification system
+
+Advanced analytics dashboard
+
+Mobile-friendly enhancements
+
+
+
+
+License
+
+MIT
+
+
+
+Built with passion by [Lemonhead - SacredLemon] and Team Plastify.
+
+
+Would you like a downloadable version of this README or for me to help auto-generate one inside your project?
+
