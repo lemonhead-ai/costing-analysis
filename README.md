@@ -1,21 +1,28 @@
-# Getting Started with Create React App
+# Getting started with cost analysis web app.
+The application is supposed to work as a tool to calculate inputs in a company set up and output expectation results after a real application scenario.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+It employes use of react with node.js + express.js and mongodb Atlas for the database.
 
 ## Available Scripts
 
 In the project directory, you can run:
 
+### `npm install`
+arsed to install node modules into the project directory.
+
 ### `npm start`
 
-Runs the app in the development mode.\
+Runs the frontend part of the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
+### `npm run dev`
+This will be run on the backend part of the app to ensure the server is running. 
+server will run on port 5000
+
 
 ### `npm test`
-
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
