@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Inputs from './components/Inputs';
@@ -10,10 +10,24 @@ import TopNav from './components/TopNav';
 function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [products, setProducts] = useState([
-    { productName: 'BASINS', item: 'GRADE 1', materialCost: 5300, weightPerUnit: 215, unit: 'grams' },
-  ]);
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/products');
+      const data = await response.json();
+      setProducts(data);
+      setFilteredProducts(data);
+    } catch (err) {
+      setError('Failed to fetch products');
+    }
+  };
 
   const handleSearch = (searchTerm) => {
     const term = searchTerm.toLowerCase();
@@ -25,26 +39,55 @@ function App() {
     setFilteredProducts(filtered);
   };
 
-  const addProduct = (newProduct) => {
-    setProducts([...products, newProduct]);
-    setFilteredProducts([...products, newProduct]);
+  const addProduct = async (newProduct) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProduct),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add product');
+      }
+
+      const savedProduct = await response.json();
+      setProducts([...products, savedProduct]);
+      setFilteredProducts([...products, savedProduct]);
+    } catch (err) {
+      setError('Failed to add product');
+    }
   };
 
   return (
     <Router>
-      <div className={`flex h-screen ${darkMode ? 'dark bg-gray-900 text-white' : 'bg-white-50 text-black'}`}>
+      <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
         <Sidebar darkMode={darkMode} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className={`flex-1 flex flex-col ${sidebarOpen ? 'ml-64' : 'ml-16'} transition-all duration-300`}>
-          <TopNav darkMode={darkMode} setDarkMode={setDarkMode} onSearch={handleSearch} />
-          <div className="flex-1 p-6 overflow-auto">
+        <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
+          <TopNav 
+            darkMode={darkMode} 
+            setDarkMode={setDarkMode} 
+            onSearch={handleSearch} 
+            products={products}
+          />
+          <main className="p-6">
+            {error && (
+              <div className={`mb-4 p-4 rounded-lg ${
+                darkMode 
+                  ? 'bg-red-900/50 text-red-200 border border-red-700' 
+                  : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
+                {error}
+              </div>
+            )}
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/inputs" element={<Inputs addProduct={addProduct} />} />
-              <Route path="/reports" element={<Reports products={filteredProducts} />} />
-              <Route path="/alerts" element={<Alerts />} />
+              <Route path="/dashboard" element={<Dashboard products={filteredProducts} darkMode={darkMode} />} />
+              <Route path="/inputs" element={<Inputs addProduct={addProduct} darkMode={darkMode} />} />
+              <Route path="/reports" element={<Reports products={filteredProducts} darkMode={darkMode} />} />
+              <Route path="/alerts" element={<Alerts darkMode={darkMode} />} />
             </Routes>
-          </div>
+          </main>
         </div>
       </div>
     </Router>
