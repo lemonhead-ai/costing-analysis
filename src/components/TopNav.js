@@ -210,7 +210,7 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed left-0 right-0 top-20 bottom-0 bg-black/30 backdrop-blur-md z-[50]"
+        className="fixed left-0 right-0 top-20 bottom-0 bg-black/10 backdrop-blur-md z-[50]"
         onClick={() => setShowResults(false)}
       />
       {/* Results dropdown, aligned with the search box */}
@@ -219,10 +219,10 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
-        className="absolute left-0 right-0 top-full mt-2 z-[101]"
+        className="absolute left-0 right-0 top-full mt-2 z-[101] backdrop-blur-md"
         style={{ pointerEvents: 'auto' }}
       >
-        <div className="bg-gray-800/95 rounded-2xl shadow-2xl max-h-[60vh] overflow-y-auto">
+        <div className={`${darkMode ? 'bg-gray-900' : 'bg-white'} rounded-xl shadow-lg border border-gray-200 max-h-[60vh] overflow-y-auto`}> 
           <div className="p-2">
             {searchResults.length === 0 && (
               <div className="text-gray-400 text-center py-6">No results found.</div>
@@ -231,12 +231,12 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
               <motion.button
                 key={product._id}
                 onClick={() => handleResultClick(product)}
-                className="w-full text-left p-4 rounded-xl hover:bg-gray-700/50 transition-colors duration-200"
+                className={`w-full text-left p-4 rounded-lg transition-colors duration-200 ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
                 <div className="flex flex-col">
-                  <span className="text-white font-bold text-lg">{product.productName}</span>
+                  <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-gray-900'}`}>{product.productName}</span>
                   <span className="text-gray-400 text-sm">{product.item}</span>
                   <div className="flex gap-4 mt-1 text-sm">
                     <span className="text-gray-400">
@@ -244,8 +244,8 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
                     </span>
                     <span className={`${
                       product.calculations.currentMargin < 0.2
-                        ? 'text-red-400'
-                        : 'text-green-400'
+                        ? 'text-red-500'
+                        : 'text-green-600'
                     }`}>
                       Margin: {(product.calculations.currentMargin * 100).toFixed(2)}%
                     </span>
@@ -261,16 +261,20 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
 
   return (
     <>
-      <div className="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700/50 shadow-md z-20 relative">
+      <div className={`w-full px-8 py-3 flex justify-between items-center border-b shadow-sm z-20 relative ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
         <div className="flex items-center flex-1 gap-4">
-          <h2 className="text-xl font-bold text-white whitespace-nowrap">Cost Analyser</h2>
+          <h2 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Cost Analyser</h2>
           <div className="relative flex-1" ref={searchRef}>
-            <input
-              type="text"
-              placeholder="Search reports..."
-              value={searchTerm}
+          <input
+            type="text"
+            placeholder="Search reports..."
+            value={searchTerm}
               onChange={handleSearch}
-              className="bg-white/20 text-white p-2 pl-4 rounded-2xl w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className={`w-full px-5 py-2 rounded-full border focus:outline-none focus:ring-2 transition-all duration-200 text-base font-medium ${
+                darkMode
+                  ? 'bg-gray-800 border-gray-700 text-gray-100 focus:border-green-500 focus:ring-green-200'
+                  : 'bg-white border-gray-300 text-gray-900 focus:border-green-600 focus:ring-green-100'
+              }`}
             />
             <AnimatePresence>
               {showResults && renderSearchOverlay()}
@@ -278,43 +282,44 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
           </div>
         </div>
         <div className="flex items-center space-x-4 ml-4">
-          <motion.button
+        <motion.button
             onClick={handleDownloadExcel}
-            className="bg-green-600 text-white px-3 py-1 rounded-xl hover:bg-green-700 transition-colors duration-200"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-          >
-            Export Excel
-          </motion.button>
-          <motion.button
+            className="bg-green-600 text-white px-4 py-2 rounded-full font-semibold shadow-sm hover:bg-green-700 transition-colors duration-200"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.2 }}
+        >
+          Export Excel
+        </motion.button>
+        <motion.button
             onClick={handleDownloadPDF}
-            className="bg-blue-700 text-white px-3 py-1 rounded-xl hover:bg-purple-600 transition-colors duration-200"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-          >
-            Export PDF
-          </motion.button>
-          <motion.button
-            onClick={() => setDarkMode(!darkMode)}
-            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            className="text-white text-2xl hover:text-gray-300"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ duration: 0.2 }}
-          >
-            {darkMode ? <CiLight /> : <CiDark />}
-          </motion.button>
-          <motion.div
-            whileHover={{ scale: 1.1, rotate: 15 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-          >
-            <CiUser className="h-9 w-6 text-white" />
-          </motion.div>
-        </div>
+            className="bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-sm hover:bg-blue-700 transition-colors duration-200"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.2 }}
+        >
+          Export PDF
+        </motion.button>
+        <motion.button
+          onClick={() => setDarkMode(!darkMode)}
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            className={`text-2xl rounded-full p-2 transition-colors duration-200 ${darkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'}`}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ duration: 0.2 }}
+        >
+          {darkMode ? <CiLight /> : <CiDark />}
+        </motion.button>
+        <motion.div
+          whileHover={{ scale: 1.1, rotate: 15 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ duration: 0.3 }}
+            className={`rounded-full p-2 ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}
+        >
+            <CiUser className={`h-8 w-8 ${darkMode ? 'text-white' : 'text-gray-700'}`} />
+        </motion.div>
       </div>
+    </div>
     </>
   );
 };

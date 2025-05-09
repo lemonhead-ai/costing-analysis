@@ -9,7 +9,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
-const Dashboard = ({ products }) => {
+const Dashboard = ({ products, darkMode }) => {
   const [viewMode, setViewMode] = useState('summary'); // 'summary' or 'detailed'
   const [showLowMarginDetails, setShowLowMarginDetails] = useState(false);
 
@@ -215,13 +215,18 @@ const Dashboard = ({ products }) => {
     },
   };
 
+  const cardBg = darkMode ? 'bg-gray-900' : 'bg-white';
+  const cardBorder = darkMode ? 'border-gray-800' : 'border-gray-200';
+  const cardText = darkMode ? 'text-gray-100' : 'text-gray-900';
+  const cardSubText = darkMode ? 'text-gray-300' : 'text-gray-700';
+
   return (
-    <div>
+    <div className="max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-semibold">Dashboard</h2>
+        <h2 className="text-3xl font-bold">Dashboard</h2>
         <motion.button
           onClick={() => setViewMode(viewMode === 'summary' ? 'detailed' : 'summary')}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200"
+          className="bg-green-600 text-white px-5 py-2 rounded-full font-semibold shadow-sm hover:bg-green-700 transition-colors duration-200"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -232,95 +237,89 @@ const Dashboard = ({ products }) => {
       {viewMode === 'summary' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <motion.div
-            className="relative bg-gradient-to-br from-gray-800/80 to-gray-700/80 backdrop-blur-xl p-6 rounded-xl shadow-lg border border-gray-700/50 flex flex-col items-center justify-center h-72 group"
-            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
+            className={`relative ${cardBg} p-6 rounded-xl shadow-lg border ${cardBorder} flex flex-col items-center justify-center h-72 group`}
+            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)' }}
             transition={{ duration: 0.3 }}
           >
-            <CiDollar className="h-10 w-10 text-blue-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-300">Total Material Cost</h3>
-            <p className="text-3xl font-bold text-white">{metrics.totalMaterialCost.toFixed(2)} KES</p>
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-900/80 p-2 rounded-lg text-sm text-gray-300">
+            <CiDollar className="h-10 w-10 text-green-600 mb-4" />
+            <h3 className={`text-lg font-medium ${cardSubText}`}>Total Material Cost</h3>
+            <p className={`text-3xl font-bold ${cardText}`}>{metrics.totalMaterialCost.toFixed(2)} KES</p>
+            <div className={`absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${cardBg} p-2 rounded-lg text-sm ${cardSubText} border ${cardBorder}`}>
               Sum of material costs across all products
             </div>
           </motion.div>
           <motion.div
-            className="relative bg-gradient-to-br from-gray-800/80 to-gray-700/80 backdrop-blur-xl p-6 rounded-xl shadow-lg border border-gray-700/50 flex flex-col items-center justify-center h-72 group"
-            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
+            className={`relative ${cardBg} p-6 rounded-xl shadow-lg border ${cardBorder} flex flex-col items-center justify-center h-72 group`}
+            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)' }}
             transition={{ duration: 0.3 }}
           >
-            <CiCalculator1 className="h-10 w-10 text-green-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-300">Minimum Production</h3>
-            <p className="text-3xl font-bold text-white">{metrics.minProduction}</p>
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-900/80 p-2 rounded-lg text-sm text-gray-300">
+            <CiCalculator1 className="h-10 w-10 text-green-600 mb-4" />
+            <h3 className={`text-lg font-medium ${cardSubText}`}>Minimum Production</h3>
+            <p className={`text-3xl font-bold ${cardText}`}>{metrics.minProduction}</p>
+            <div className={`absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${cardBg} p-2 rounded-lg text-sm ${cardSubText} border ${cardBorder}`}>
               Average units producible from 25kg of material
             </div>
           </motion.div>
           <motion.div
-            className="relative bg-gradient-to-br from-gray-800/80 to-gray-700/80 backdrop-blur-xl p-6 rounded-xl shadow-lg border border-gray-700/50 flex flex-col items-center justify-center h-72 group"
-            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
+            className={`relative ${cardBg} p-6 rounded-xl shadow-lg border ${cardBorder} flex flex-col items-center justify-center h-72 group`}
+            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)' }}
             transition={{ duration: 0.3 }}
           >
-            <CiShoppingTag className="h-10 w-10 text-purple-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-300">Average Selling Price</h3>
-            <p className="text-3xl font-bold text-white">{metrics.avgSellingPrice} KES</p>
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-900/80 p-2 rounded-lg text-sm text-gray-300">
+            <CiShoppingTag className="h-10 w-10 text-green-600 mb-4" />
+            <h3 className={`text-lg font-medium ${cardSubText}`}>Average Selling Price</h3>
+            <p className={`text-3xl font-bold ${cardText}`}>{metrics.avgSellingPrice} KES</p>
+            <div className={`absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${cardBg} p-2 rounded-lg text-sm ${cardSubText} border ${cardBorder}`}>
               Average proposed selling price (incl. VAT)
             </div>
           </motion.div>
           <motion.div
-            className={`relative ${
-              metrics.marginAlerts > 0 ? 'bg-red-500/70' : 'bg-gray-800/80'
-            } backdrop-blur-xl p-6 rounded-xl shadow-lg border border-gray-700/50 flex flex-col items-center justify-center h-72 group cursor-pointer`}
-            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
+            className={`relative ${metrics.marginAlerts > 0 ? (darkMode ? 'bg-red-900' : 'bg-red-100') : cardBg} p-6 rounded-xl shadow-lg border ${cardBorder} flex flex-col items-center justify-center h-72 group cursor-pointer`}
+            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)' }}
             transition={{ duration: 0.3 }}
             onClick={() => setShowLowMarginDetails(!showLowMarginDetails)}
           >
-            <CiWarning className={`h-10 w-10 ${metrics.marginAlerts > 0 ? 'text-white' : 'text-red-400'} mb-4`} />
-            <h3 className={`text-lg font-medium ${metrics.marginAlerts > 0 ? 'text-white' : 'text-gray-300'}`}>
-              Margin Alerts
-            </h3>
-            <p className={`text-3xl font-bold ${metrics.marginAlerts > 0 ? 'text-white' : 'text-white'}`}>
-              {metrics.marginAlerts}
-            </p>
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-900/80 p-2 rounded-lg text-sm text-gray-300">
+            <CiWarning className={`h-10 w-10 ${metrics.marginAlerts > 0 ? 'text-red-600' : 'text-green-600'} mb-4`} />
+            <h3 className={`text-lg font-medium ${metrics.marginAlerts > 0 ? 'text-red-600' : cardSubText}`}>Margin Alerts</h3>
+            <p className={`text-3xl font-bold ${metrics.marginAlerts > 0 ? 'text-red-600' : cardText}`}>{metrics.marginAlerts}</p>
+            <div className={`absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${cardBg} p-2 rounded-lg text-sm ${cardSubText} border ${cardBorder}`}>
               Products with margin below 10% (click to view)
             </div>
           </motion.div>
           <motion.div
-            className="relative bg-gradient-to-br from-gray-800/80 to-gray-700/80 backdrop-blur-xl p-6 rounded-xl shadow-lg border border-gray-700/50 flex flex-col items-center justify-center h-72 group"
-            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
+            className={`relative ${cardBg} p-6 rounded-xl shadow-lg border ${cardBorder} flex flex-col items-center justify-center h-72 group`}
+            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)' }}
             transition={{ duration: 0.3 }}
           >
-            <SlCalender className="h-10 w-10 text-yellow-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-300">Last Downloaded Report</h3>
-            <p className="text-3xl font-bold text-white">{metrics.lastDownload}</p>
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-900/80 p-2 rounded-lg text-sm text-gray-300">
+            <SlCalender className="h-10 w-10 text-green-600 mb-4" />
+            <h3 className={`text-lg font-medium ${cardSubText}`}>Last Downloaded Report</h3>
+            <p className={`text-3xl font-bold ${cardText}`}>{metrics.lastDownload}</p>
+            <div className={`absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${cardBg} p-2 rounded-lg text-sm ${cardSubText} border ${cardBorder}`}>
               Date of the last report download
             </div>
           </motion.div>
           <motion.div
-            className="relative bg-gradient-to-br from-green-500/70 to-green-600/70 backdrop-blur-xl p-6 rounded-xl shadow-lg border border-gray-700/50 flex flex-col items-center justify-center h-72 group"
-            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
+            className={`relative ${darkMode ? 'bg-green-900' : 'bg-green-100'} p-6 rounded-xl shadow-lg border ${darkMode ? 'border-green-800' : 'border-green-200'} flex flex-col items-center justify-center h-72 group`}
+            whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)' }}
             transition={{ duration: 0.3 }}
           >
-            <HiOutlineChartBar className="h-10 w-10 text-white mb-4" />
-            <h3 className="text-lg font-medium text-white">Avg Profit Margin per KG</h3>
-            <p className="text-3xl font-bold text-white">{metrics.avgProfitMarginPerKg} KES</p>
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-900/80 p-2 rounded-lg text-sm text-gray-300">
+            <HiOutlineChartBar className="h-10 w-10 text-green-600 mb-4" />
+            <h3 className={`text-lg font-medium ${darkMode ? 'text-green-200' : 'text-green-700'}`}>Avg Profit Margin per KG</h3>
+            <p className={`text-3xl font-bold ${darkMode ? 'text-green-200' : 'text-green-700'}`}>{metrics.avgProfitMarginPerKg} KES</p>
+            <div className={`absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${cardBg} p-2 rounded-lg text-sm ${cardSubText} border ${cardBorder}`}>
               Average profit margin per kilogram of material
             </div>
           </motion.div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-gray-800/80 backdrop-blur-xl p-6 rounded-xl shadow-lg border border-gray-700/50">
-            <h3 className="text-lg font-medium text-gray-300 mb-4">Profit Margin per KG by Product</h3>
+          <div className={`${cardBg} p-6 rounded-xl shadow-lg border ${cardBorder}`}>
+            <h3 className={`text-lg font-medium ${cardSubText} mb-4`}>Profit Margin per KG by Product</h3>
             <div className="h-96">
               <Bar data={barChartData} options={chartOptions} />
             </div>
           </div>
-          <div className="bg-gray-800/80 backdrop-blur-xl p-6 rounded-xl shadow-lg border border-gray-700/50">
-            <h3 className="text-lg font-medium text-gray-300 mb-4">Average Cost Breakdown</h3>
+          <div className={`${cardBg} p-6 rounded-xl shadow-lg border ${cardBorder}`}>
+            <h3 className={`text-lg font-medium ${cardSubText} mb-4`}>Average Cost Breakdown</h3>
             <div className="h-96 flex justify-center">
               <Pie data={pieChartData} options={pieChartOptions} />
             </div>
@@ -331,30 +330,30 @@ const Dashboard = ({ products }) => {
       {/* Low Margin Details Modal */}
       {showLowMarginDetails && metrics.marginAlerts > 0 && (
         <motion.div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="bg-gray-800/90 backdrop-blur-xl p-6 rounded-xl shadow-lg border border-gray-700/50 max-w-lg w-full"
+            className={`${cardBg} p-6 rounded-xl shadow-lg border ${cardBorder} max-w-lg w-full`}
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.9 }}
           >
-            <h3 className="text-lg font-medium text-gray-300 mb-4">Low Margin Products</h3>
+            <h3 className={`text-lg font-medium ${cardSubText} mb-4`}>Low Margin Products</h3>
             <div className="max-h-60 overflow-y-auto">
               {productMetrics
                 .filter(m => m.currentMargin < 0.1)
                 .map((m, index) => (
-                  <div key={index} className="p-2 border-b border-gray-700/50 text-white">
+                  <div key={index} className={`p-2 border-b ${cardBorder} ${cardText}`}>
                     {m.productName} ({m.item}): {(m.currentMargin * 100).toFixed(2)}%
                   </div>
                 ))}
             </div>
             <motion.button
               onClick={() => setShowLowMarginDetails(false)}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200"
+              className="mt-4 bg-red-600 text-white px-5 py-2 rounded-full font-semibold shadow-sm hover:bg-red-700 transition-colors duration-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

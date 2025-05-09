@@ -32,9 +32,9 @@ const Alerts = ({ darkMode }) => {
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold mb-6">Margin Alerts</h2>
-      <div className={`p-6 rounded-xl ${darkMode ? 'bg-gray-800/50' : 'bg-white'} shadow-lg border border-gray-700/50`}>
+    <div className="max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6">Margin Alerts</h2>
+      <div className={`p-6 rounded-xl ${darkMode ? 'bg-gray-900' : 'bg-white'} shadow-lg border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
         {loading ? (
           <p>Loading alerts...</p>
         ) : alerts.length === 0 ? (
@@ -42,18 +42,18 @@ const Alerts = ({ darkMode }) => {
         ) : (
           <ul>
             {alerts.map((product) => (
-              <li key={product._id} className="mb-4 p-4 rounded-lg bg-red-900/20 flex flex-col md:flex-row md:items-center md:justify-between">
+              <li key={product._id} className={`mb-4 p-4 rounded-xl flex flex-col md:flex-row md:items-center md:justify-between ${darkMode ? 'bg-red-900/10' : 'bg-red-100/60'}`}>
                 <div>
-                  <span className="font-bold text-lg text-white">{product.productName}</span>
+                  <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-gray-900'}`}>{product.productName}</span>
                   <span className="ml-2 text-gray-400">({product.item})</span>
-                  <span className="ml-4 text-red-400 font-semibold">
+                  <span className="ml-4 text-red-500 font-semibold">
                     Margin: {(product.calculations.currentMargin * 100).toFixed(2)}%
                   </span>
                 </div>
                 <div className="mt-2 md:mt-0 flex gap-2">
                   <button
                     onClick={() => handleView(product)}
-                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition"
+                    className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold transition-colors duration-200 shadow-sm bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     View
                   </button>

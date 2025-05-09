@@ -5,6 +5,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useNavigate } from 'react-router-dom';
+import { HiOutlineDownload } from 'react-icons/hi';
 
 function Reports({ products, darkMode }) {
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -353,29 +354,29 @@ function Reports({ products, darkMode }) {
   };
 
   const inputClasses = `
-    w-full px-4 py-2 rounded-lg border transition-colors duration-200
+    w-full px-4 py-2 rounded-xl border transition-colors duration-200
     ${darkMode 
-      ? 'bg-gray-800 border-gray-700 text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20' 
-      : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+      ? 'bg-gray-900 border-gray-800 text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-200' 
+      : 'bg-white border-gray-200 text-gray-900 focus:border-green-600 focus:ring-2 focus:ring-green-100'
     }
   `;
 
   const selectClasses = `
-    px-4 py-2 rounded-lg border transition-colors duration-200
+    px-4 py-2 rounded-xl border transition-colors duration-200
     ${darkMode 
-      ? 'bg-gray-800 border-gray-700 text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20' 
-      : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+      ? 'bg-gray-900 border-gray-800 text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-200' 
+      : 'bg-white border-gray-200 text-gray-900 focus:border-green-600 focus:ring-2 focus:ring-green-100'
     }
   `;
 
   const buttonClasses = (isPrimary = true) => `
-    px-6 py-2 rounded-lg font-medium transition-colors duration-200
+    flex items-center gap-2 px-5 py-2 rounded-full font-semibold transition-colors duration-200 shadow-sm
     ${isPrimary
       ? darkMode
-        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-        : 'bg-blue-500 hover:bg-blue-600 text-white'
+        ? 'bg-green-600 hover:bg-green-700 text-white'
+        : 'bg-green-600 hover:bg-green-700 text-white'
       : darkMode
-        ? 'bg-gray-700 hover:bg-gray-600 text-gray-100'
+        ? 'bg-gray-800 hover:bg-gray-700 text-gray-100'
         : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
     }
   `;
@@ -387,18 +388,18 @@ function Reports({ products, darkMode }) {
       </h1>
 
       {error && (
-        <div className={`mb-6 p-4 rounded-lg ${
+        <div className={`mb-6 p-4 rounded-xl border ${
           darkMode 
-            ? 'bg-red-900/50 text-red-200 border border-red-700' 
-            : 'bg-red-50 text-red-700 border border-red-200'
+            ? 'bg-red-900 text-red-200 border-red-700' 
+            : 'bg-red-100 text-red-700 border-red-300'
         }`}>
           {error}
         </div>
       )}
 
       <div className={`p-6 rounded-xl ${
-        darkMode ? 'bg-gray-800/50' : 'bg-white'
-      } shadow-lg mb-6`}>
+        darkMode ? 'bg-gray-900' : 'bg-white'
+      } shadow-lg mb-6 border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <input
@@ -420,7 +421,7 @@ function Reports({ products, darkMode }) {
               <option value="above20">Current Margin ≥ 20%</option>
             </select>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <input
               type="file"
               id="fileInput"
@@ -440,13 +441,13 @@ function Reports({ products, darkMode }) {
               onClick={handleDownloadReport}
               className={buttonClasses(true)}
             >
-              Download Excel
+              <HiOutlineDownload className="text-lg" /> Excel
             </button>
             <button
               onClick={handleDownloadPDF}
               className={buttonClasses(true)}
             >
-              Download PDF
+              <HiOutlineDownload className="text-lg" /> PDF
             </button>
           </div>
         </div>
@@ -454,18 +455,18 @@ function Reports({ products, darkMode }) {
 
       {filteredProducts.length === 0 ? (
         <div className={`p-6 rounded-xl ${
-          darkMode ? 'bg-gray-800/50' : 'bg-white'
-        } shadow-lg text-center`}>
+          darkMode ? 'bg-gray-900' : 'bg-white'
+        } shadow-lg text-center border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
           <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             No products match your search or filter criteria.
           </p>
         </div>
       ) : (
         <div className={`overflow-x-auto rounded-xl ${
-          darkMode ? 'bg-gray-800/50' : 'bg-white'
-        } shadow-lg`}>
+          darkMode ? 'bg-gray-900' : 'bg-white'
+        } shadow-lg border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
           <table className="w-full">
-            <thead>
+          <thead>
               <tr className={`${
                 darkMode ? 'bg-gray-700/50' : 'bg-gray-50'
               }`}>
@@ -550,9 +551,9 @@ function Reports({ products, darkMode }) {
                   Profit Margin per KG {sortKey === 'calculations.profitMarginPerKg' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="p-4 text-left font-medium text-gray-300">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+            </tr>
+          </thead>
+          <tbody>
               {filteredProducts.map((product) => (
                 <tr key={product._id} className={`border-t ${
                   darkMode ? 'border-gray-700' : 'border-gray-200'
@@ -607,11 +608,11 @@ function Reports({ products, darkMode }) {
                       Delete
                     </button>
                   </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       )}
     </div>
   );

@@ -214,10 +214,10 @@ function Inputs({ addProduct, darkMode }) {
   };
 
   const inputClasses = (fieldName) => `
-    w-full px-4 py-2 rounded-lg border transition-colors duration-200
+    w-full px-4 py-2 rounded-xl border transition-colors duration-200
     ${darkMode 
-      ? 'bg-gray-800 border-gray-700 text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20' 
-      : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+      ? 'bg-gray-900 border-gray-800 text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-200' 
+      : 'bg-white border-gray-200 text-gray-900 focus:border-green-600 focus:ring-2 focus:ring-green-100'
     }
     ${invalidFields.includes(fieldName) 
       ? darkMode 
@@ -228,21 +228,21 @@ function Inputs({ addProduct, darkMode }) {
   `;
 
   const selectClasses = `
-    px-4 py-2 rounded-lg border transition-colors duration-200
+    px-4 py-2 rounded-xl border transition-colors duration-200
     ${darkMode 
-      ? 'bg-gray-800 border-gray-700 text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20' 
-      : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+      ? 'bg-gray-900 border-gray-800 text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-200' 
+      : 'bg-white border-gray-200 text-gray-900 focus:border-green-600 focus:ring-2 focus:ring-green-100'
     }
   `;
 
   const buttonClasses = (isPrimary = true) => `
-    px-6 py-2 rounded-lg font-medium transition-colors duration-200
+    flex items-center gap-2 px-5 py-2 rounded-full font-semibold transition-colors duration-200 shadow-sm
     ${isPrimary
       ? darkMode
-        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-        : 'bg-blue-500 hover:bg-blue-600 text-white'
+        ? 'bg-green-600 hover:bg-green-700 text-white'
+        : 'bg-green-600 hover:bg-green-700 text-white'
       : darkMode
-        ? 'bg-gray-700 hover:bg-gray-600 text-gray-100'
+        ? 'bg-gray-800 hover:bg-gray-700 text-gray-100'
         : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
     }
   `;
@@ -254,18 +254,18 @@ function Inputs({ addProduct, darkMode }) {
       </h1>
 
       {error && (
-        <div className={`mb-6 p-4 rounded-lg ${
+        <div className={`mb-6 p-4 rounded-xl border ${
           darkMode 
-            ? 'bg-red-900/50 text-red-200 border border-red-700' 
-            : 'bg-red-50 text-red-700 border border-red-200'
+            ? 'bg-red-900 text-red-200 border-red-700' 
+            : 'bg-red-100 text-red-700 border-red-300'
         }`}>
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className={`p-6 rounded-xl ${
-        darkMode ? 'bg-gray-800/50' : 'bg-white'
-      } shadow-lg`}>
+        darkMode ? 'bg-gray-900' : 'bg-white'
+      } shadow-lg border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={`block text-sm font-medium mb-2 ${
@@ -472,7 +472,7 @@ function Inputs({ addProduct, darkMode }) {
             <button
               type="button"
               onClick={handleCancelEdit}
-              className="px-6 py-2 rounded-lg font-medium transition-colors duration-200 bg-gray-500 hover:bg-gray-600 text-white"
+              className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold transition-colors duration-200 shadow-sm bg-gray-500 hover:bg-gray-600 text-white"
             >
               Cancel Edit
             </button>
@@ -481,17 +481,13 @@ function Inputs({ addProduct, darkMode }) {
       </form>
 
       {calculations && (
-        <div className={`mt-8 p-6 rounded-xl ${
-          darkMode ? 'bg-gray-800/50' : 'bg-white'
-        } shadow-lg`}>
-          <h2 className={`text-xl font-semibold mb-6 ${
-            darkMode ? 'text-gray-100' : 'text-gray-900'
-          }`}>
+        <div className={`mt-8 p-6 rounded-xl ${darkMode ? 'bg-gray-900' : 'bg-white'} shadow-lg border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
+          <h2 className={`text-xl font-semibold mb-6 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
             Calculations
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className={`p-4 rounded-lg ${
-              darkMode ? 'bg-gray-700/50' : 'bg-gray-50'
+            <div className={`p-4 rounded-xl ${
+              darkMode ? 'bg-gray-800' : 'bg-gray-100'
             }`}>
               <p className={`text-sm font-medium mb-1 ${
                 darkMode ? 'text-gray-400' : 'text-gray-600'
@@ -504,8 +500,8 @@ function Inputs({ addProduct, darkMode }) {
                 {calculations.costPerItem.toFixed(2)} KES
               </p>
             </div>
-            <div className={`p-4 rounded-lg ${
-              darkMode ? 'bg-gray-700/50' : 'bg-gray-50'
+            <div className={`p-4 rounded-xl ${
+              darkMode ? 'bg-gray-800' : 'bg-gray-100'
             }`}>
               <p className={`text-sm font-medium mb-1 ${
                 darkMode ? 'text-gray-400' : 'text-gray-600'
@@ -518,8 +514,8 @@ function Inputs({ addProduct, darkMode }) {
                 {calculations.overheads.toFixed(2)} KES
               </p>
             </div>
-            <div className={`p-4 rounded-lg ${
-              darkMode ? 'bg-gray-700/50' : 'bg-gray-50'
+            <div className={`p-4 rounded-xl ${
+              darkMode ? 'bg-gray-800' : 'bg-gray-100'
             }`}>
               <p className={`text-sm font-medium mb-1 ${
                 darkMode ? 'text-gray-400' : 'text-gray-600'
@@ -532,14 +528,14 @@ function Inputs({ addProduct, darkMode }) {
                 {calculations.proposedSellingPrice.toFixed(2)} KES
               </p>
             </div>
-            <div className={`p-4 rounded-lg ${
+            <div className={`p-4 rounded-xl ${
               calculations.currentMargin < 0.2
                 ? darkMode
-                  ? 'bg-red-900/30'
-                  : 'bg-red-50'
+                  ? 'bg-red-900'
+                  : 'bg-red-100'
                 : darkMode
-                  ? 'bg-green-900/30'
-                  : 'bg-green-50'
+                  ? 'bg-green-900'
+                  : 'bg-green-100'
             }`}>
               <p className={`text-sm font-medium mb-1 ${
                 darkMode ? 'text-gray-400' : 'text-gray-600'
@@ -555,8 +551,8 @@ function Inputs({ addProduct, darkMode }) {
               </p>
             </div>
             {calculations.suggestedSellingPrice && (
-              <div className={`p-4 rounded-lg ${
-                darkMode ? 'bg-yellow-900/30' : 'bg-yellow-50'
+              <div className={`p-4 rounded-xl ${
+                darkMode ? 'bg-yellow-900' : 'bg-yellow-100'
               }`}>
                 <p className={`text-sm font-medium mb-1 ${
                   darkMode ? 'text-gray-400' : 'text-gray-600'
@@ -568,8 +564,8 @@ function Inputs({ addProduct, darkMode }) {
                 </p>
               </div>
             )}
-            <div className={`p-4 rounded-lg ${
-              darkMode ? 'bg-gray-700/50' : 'bg-gray-50'
+            <div className={`p-4 rounded-xl ${
+              darkMode ? 'bg-gray-800' : 'bg-gray-100'
             }`}>
               <p className={`text-sm font-medium mb-1 ${
                 darkMode ? 'text-gray-400' : 'text-gray-600'
