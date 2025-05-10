@@ -6,10 +6,11 @@ import Reports from './components/Reports';
 import Alerts from './components/Alerts';
 import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
+import { motion } from 'framer-motion';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [error, setError] = useState('');
@@ -51,9 +52,7 @@ function App() {
         throw new Error('Failed to add product');
       }
 
-      const savedProduct = await response.json();
-      setProducts([...products, savedProduct]);
-      setFilteredProducts([...products, savedProduct]);
+      await fetchProducts();
     } catch (err) {
       setError('Failed to add product');
     }
@@ -62,8 +61,12 @@ function App() {
   return (
     <Router>
       <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
-        <Sidebar darkMode={darkMode} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
+        <Sidebar darkMode={darkMode} setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} />
+        <motion.div
+          className="flex-1 min-h-screen pl-10"
+          animate={{ marginLeft: sidebarOpen ? 256 : 64 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        >
           <TopNav 
             darkMode={darkMode} 
             setDarkMode={setDarkMode} 
@@ -83,12 +86,12 @@ function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" />} />
               <Route path="/dashboard" element={<Dashboard products={filteredProducts} darkMode={darkMode} />} />
-              <Route path="/inputs" element={<Inputs addProduct={addProduct} darkMode={darkMode} />} />
+              <Route path="/inputs" element={<Inputs addProduct={addProduct} darkMode={darkMode} fetchProducts={fetchProducts} />} />
               <Route path="/reports" element={<Reports products={filteredProducts} darkMode={darkMode} />} />
               <Route path="/alerts" element={<Alerts darkMode={darkMode} />} />
             </Routes>
           </main>
-        </div>
+        </motion.div>
       </div>
     </Router>
   );

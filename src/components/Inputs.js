@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-function Inputs({ addProduct, darkMode }) {
+function Inputs({ addProduct, darkMode, fetchProducts }) {
   const location = useLocation();
   const navigate = useNavigate();
   const editingProduct = location.state && location.state.product;
@@ -15,9 +15,7 @@ function Inputs({ addProduct, darkMode }) {
     currentSellingPrice: '',
     hourlyProduction: '',
     unit: 'grams',
-    overheadType: 'percentage',
     overheadPercentage: '25',
-    machineCostPerHour: '500',
   });
 
   const [calculations, setCalculations] = useState(null);
@@ -36,9 +34,7 @@ function Inputs({ addProduct, darkMode }) {
         currentSellingPrice: editingProduct.currentSellingPrice?.toString() || '',
         hourlyProduction: editingProduct.hourlyProduction?.toString() || '',
         unit: editingProduct.unit || 'grams',
-        overheadType: editingProduct.overheadType || 'percentage',
         overheadPercentage: editingProduct.overheadPercentage?.toString() || '25',
-        machineCostPerHour: editingProduct.machineCostPerHour?.toString() || '500',
       });
       setIsEditMode(true);
       setCalculations(editingProduct.calculations || null);
@@ -57,11 +53,6 @@ function Inputs({ addProduct, darkMode }) {
     setError('');
   };
 
-  const handleOverheadTypeChange = (e) => {
-    setFormData({ ...formData, overheadType: e.target.value });
-    setError('');
-  };
-
   const handleClearForm = () => {
     setFormData({
       productName: '',
@@ -72,9 +63,7 @@ function Inputs({ addProduct, darkMode }) {
       currentSellingPrice: '',
       hourlyProduction: '',
       unit: 'grams',
-      overheadType: 'percentage',
       overheadPercentage: '25',
-      machineCostPerHour: '500',
     });
     setError('');
     setInvalidFields([]);
@@ -113,21 +102,11 @@ function Inputs({ addProduct, darkMode }) {
       setError('Hourly Production must be greater than 0');
       newInvalidFields.push('hourlyProduction');
     }
-    if (
-      formData.overheadType === 'percentage' &&
-      (!formData.overheadPercentage ||
+    if (!formData.overheadPercentage ||
         parseFloat(formData.overheadPercentage) < 0 ||
-        parseFloat(formData.overheadPercentage) > 100)
-    ) {
+        parseFloat(formData.overheadPercentage) > 100) {
       setError('Overhead Percentage must be between 0 and 100');
       newInvalidFields.push('overheadPercentage');
-    }
-    if (
-      formData.overheadType === 'machine' &&
-      (!formData.machineCostPerHour || parseFloat(formData.machineCostPerHour) <= 0)
-    ) {
-      setError('Machine Cost per Hour must be greater than 0');
-      newInvalidFields.push('machineCostPerHour');
     }
 
     if (newInvalidFields.length > 0) {
@@ -142,13 +121,8 @@ function Inputs({ addProduct, darkMode }) {
       const minimumProduction = 25000 / weightPerUnit;
       const costPerItem = totalMaterial / minimumProduction;
 
-      let overheads;
-      if (formData.overheadType === 'percentage') {
-        const overheadRate = parseFloat(formData.overheadPercentage) / 100;
-        overheads = costPerItem * overheadRate;
-      } else {
-        overheads = parseFloat(formData.machineCostPerHour) / parseFloat(formData.hourlyProduction);
-      }
+      const overheadRate = parseFloat(formData.overheadPercentage) / 100;
+      const overheads = costPerItem * overheadRate;
 
       const profitMargin = (costPerItem + overheads) * 0.10;
       const sellingPriceExclusive = costPerItem + overheads + profitMargin;
@@ -172,9 +146,7 @@ function Inputs({ addProduct, darkMode }) {
         minimumProduction,
         costPerItem,
         overheads,
-        overheadType: formData.overheadType,
         overheadPercentage: formData.overheadPercentage,
-        machineCostPerHour: formData.machineCostPerHour,
         profitMargin,
         sellingPriceExclusive,
         vat,
@@ -188,7 +160,19 @@ function Inputs({ addProduct, darkMode }) {
 
       setCalculations(newCalculations);
 
-      const productData = { ...formData, calculations: newCalculations };
+      const productData = {
+        productName: formData.productName,
+        item: formData.item,
+        materialCost: parseFloat(formData.materialCost),
+        masterBatchCost: parseFloat(formData.masterBatchCost),
+        weightPerUnit: parseFloat(formData.weightPerUnit),
+        unit: formData.unit,
+        currentSellingPrice: parseFloat(formData.currentSellingPrice),
+        hourlyProduction: parseFloat(formData.hourlyProduction),
+        overheadType: 'percentage',
+        overheadPercentage: parseFloat(formData.overheadPercentage),
+        machineCostPerHour: 0
+      };
       if (isEditMode && editingProduct && editingProduct._id) {
         const response = await fetch(`http://localhost:5000/api/products/${editingProduct._id}`, {
           method: 'PUT',
@@ -197,10 +181,10 @@ function Inputs({ addProduct, darkMode }) {
         });
         if (!response.ok) throw new Error('Failed to update product');
         setIsEditMode(false);
+        if (fetchProducts) await fetchProducts();
         navigate('/reports');
       } else {
         addProduct(productData);
-        handleClearForm();
       }
     } catch (err) {
       setError('Calculation error. Please check your inputs.');
@@ -409,49 +393,22 @@ function Inputs({ addProduct, darkMode }) {
           <div>
             <label className={`block text-sm font-medium mb-2 ${
               darkMode ? 'text-gray-300' : 'text-gray-700'
-            }`} htmlFor="overheadType">
-              Overhead Calculation
+            }`} htmlFor="overheadPercentage">
+              Overhead Percentage (%)
             </label>
-            <div className="flex gap-2">
-              <select
-                name="overheadType"
-                id="overheadType"
-                value={formData.overheadType}
-                onChange={handleOverheadTypeChange}
-                className={selectClasses}
-              >
-                <option value="percentage">Percentage-Based</option>
-                <option value="machine">Machine-Cost-Based</option>
-              </select>
-              {formData.overheadType === 'percentage' ? (
-                <input
-                  type="number"
-                  name="overheadPercentage"
-                  id="overheadPercentage"
-                  placeholder="e.g., 25"
-                  value={formData.overheadPercentage}
-                  onChange={handleInputChange}
-                  className={inputClasses('overheadPercentage')}
-                  required
-                  min="0"
-                  max="100"
-                  step="0.1"
-                />
-              ) : (
-                <input
-                  type="number"
-                  name="machineCostPerHour"
-                  id="machineCostPerHour"
-                  placeholder="e.g., 500"
-                  value={formData.machineCostPerHour}
-                  onChange={handleInputChange}
-                  className={inputClasses('machineCostPerHour')}
-                  required
-                  min="0"
-                  step="0.01"
-                />
-              )}
-            </div>
+            <input
+              type="number"
+              name="overheadPercentage"
+              id="overheadPercentage"
+              placeholder="e.g., 25"
+              value={formData.overheadPercentage}
+              onChange={handleInputChange}
+              className={inputClasses('overheadPercentage')}
+              required
+              min="0"
+              max="100"
+              step="0.1"
+            />
           </div>
         </div>
         <div className="mt-8 flex gap-4">

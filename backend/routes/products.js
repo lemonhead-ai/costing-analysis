@@ -229,4 +229,74 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// ADMIN: Recalculate calculations for all products
+router.post('/recalculate-all', async (req, res) => {
+  try {
+    const products = await Product.find();
+    let updatedCount = 0;
+    for (const product of products) {
+      // Use the same calculation logic as in POST/PUT
+      const materialCost = product.materialCost;
+      const masterBatchCost = product.masterBatchCost || 0;
+      const weightPerUnit = product.unit === 'kilograms' ? product.weightPerUnit * 1000 : product.weightPerUnit;
+      const currentSellingPrice = product.currentSellingPrice;
+      const hourlyProduction = product.hourlyProduction;
+      const overheadType = product.overheadType;
+      const overheadPercentage = overheadType === 'percentage' ? (product.overheadPercentage || 25) : 0;
+      const machineCostPerHour = overheadType === 'machine' ? (product.machineCostPerHour || 500) : 0;
+
+      const materialPricePerKg = materialCost / 25;
+      const totalMaterial = materialCost + masterBatchCost;
+      const minimumProduction = 25000 / weightPerUnit;
+      const costPerItem = totalMaterial / minimumProduction;
+
+      let overheads;
+      if (overheadType === 'percentage') {
+        const overheadRate = overheadPercentage / 100;
+        overheads = costPerItem * overheadRate;
+      } else {
+        overheads = machineCostPerHour / hourlyProduction;
+      }
+
+      const profitMargin = (costPerItem + overheads) * 0.10;
+      const sellingPriceExclusive = costPerItem + overheads + profitMargin;
+      const vat = sellingPriceExclusive * 0.16;
+      const proposedSellingPrice = sellingPriceExclusive + vat;
+      const pcsFrom1Kg = 1000 / weightPerUnit;
+      const valueOfProductFrom1Kg = currentSellingPrice * pcsFrom1Kg;
+      const currentMargin = (currentSellingPrice - costPerItem * 1.16) / currentSellingPrice;
+      const profitMarginPerKg = valueOfProductFrom1Kg - materialPricePerKg;
+
+      let suggestedSellingPrice = null;
+      if (currentMargin < 0.2) {
+        suggestedSellingPrice = (costPerItem * 1.16) / 0.8;
+      }
+
+      const calculations = {
+        materialPricePerKg,
+        totalMaterial,
+        minimumProduction,
+        costPerItem,
+        overheads,
+        profitMargin,
+        sellingPriceExclusive,
+        vat,
+        proposedSellingPrice,
+        currentMargin,
+        pcsFrom1Kg,
+        valueOfProductFrom1Kg,
+        profitMarginPerKg,
+        suggestedSellingPrice,
+      };
+
+      product.calculations = calculations;
+      await product.save();
+      updatedCount++;
+    }
+    res.json({ message: `Recalculated calculations for ${updatedCount} products.` });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to recalculate products', error: err.message });
+  }
+});
+
 module.exports = router;

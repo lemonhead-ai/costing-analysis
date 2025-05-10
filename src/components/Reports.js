@@ -115,6 +115,7 @@ function Reports({ products, darkMode }) {
     ];
 
     filteredProducts.forEach((product) => {
+      const calc = recalcMetrics(product);
       worksheet.addRow({
         productName: product.productName,
         item: product.item,
@@ -127,14 +128,14 @@ function Reports({ products, darkMode }) {
         overheadType: product.overheadType,
         overheadPercentage: parseFloat(product.overheadPercentage),
         machineCostPerHour: parseFloat(product.machineCostPerHour),
-        costPerItem: product.calculations.costPerItem.toFixed(2),
-        overheads: product.calculations.overheads.toFixed(2),
-        proposedSellingPrice: product.calculations.proposedSellingPrice.toFixed(2),
-        currentMargin: (product.calculations.currentMargin * 100).toFixed(2),
-        suggestedSellingPrice: product.calculations.suggestedSellingPrice
-          ? product.calculations.suggestedSellingPrice.toFixed(2)
+        costPerItem: calc.costPerItem.toFixed(2),
+        overheads: calc.overheads.toFixed(2),
+        proposedSellingPrice: calc.proposedSellingPrice.toFixed(2),
+        currentMargin: (calc.currentMargin * 100).toFixed(2),
+        suggestedSellingPrice: calc.suggestedSellingPrice
+          ? calc.suggestedSellingPrice.toFixed(2)
           : '',
-        profitMarginPerKg: product.calculations.profitMarginPerKg.toFixed(2),
+        profitMarginPerKg: calc.profitMarginPerKg.toFixed(2),
       });
     });
 
@@ -182,27 +183,30 @@ function Reports({ products, darkMode }) {
       'Profit Margin per KG (KES)',
     ];
 
-    const tableRows = filteredProducts.map((product) => [
-      product.productName,
-      product.item,
-      parseFloat(product.materialCost).toFixed(2),
-      parseFloat(product.masterBatchCost).toFixed(2),
-      parseFloat(product.weightPerUnit).toFixed(3),
-      product.unit,
-      parseFloat(product.currentSellingPrice).toFixed(2),
-      parseFloat(product.hourlyProduction),
-      product.overheadType,
-      parseFloat(product.overheadPercentage).toFixed(2),
-      parseFloat(product.machineCostPerHour).toFixed(2),
-      product.calculations.costPerItem.toFixed(2),
-      product.calculations.overheads.toFixed(2),
-      product.calculations.proposedSellingPrice.toFixed(2),
-      (product.calculations.currentMargin * 100).toFixed(2),
-      product.calculations.suggestedSellingPrice
-        ? product.calculations.suggestedSellingPrice.toFixed(2)
-        : '-',
-      product.calculations.profitMarginPerKg.toFixed(2),
-    ]);
+    const tableRows = filteredProducts.map((product) => {
+      const calc = recalcMetrics(product);
+      return [
+        product.productName,
+        product.item,
+        parseFloat(product.materialCost).toFixed(2),
+        parseFloat(product.masterBatchCost).toFixed(2),
+        parseFloat(product.weightPerUnit).toFixed(3),
+        product.unit,
+        parseFloat(product.currentSellingPrice).toFixed(2),
+        parseFloat(product.hourlyProduction),
+        product.overheadType,
+        parseFloat(product.overheadPercentage).toFixed(2),
+        parseFloat(product.machineCostPerHour).toFixed(2),
+        calc.costPerItem.toFixed(2),
+        calc.overheads.toFixed(2),
+        calc.proposedSellingPrice.toFixed(2),
+        (calc.currentMargin * 100).toFixed(2),
+        calc.suggestedSellingPrice
+          ? calc.suggestedSellingPrice.toFixed(2)
+          : '-',
+        calc.profitMarginPerKg.toFixed(2),
+      ];
+    });
 
     autoTable(doc, {
       head: [tableColumns],
@@ -288,20 +292,28 @@ function Reports({ products, darkMode }) {
         'hourlyproduction': 'hourlyProduction',
       };
 
-      const actualHeaders = Object.keys(validData[0] || {}).map(h => 
+      const actualHeaders = Object.keys(validData[0] || {}).map(h =>
         h.toLowerCase().replace(/\s+/g, '').replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9]/g, '')
       );
 
-      const mappedHeaders = actualHeaders.map(h => headerMap[h] || h);
+      // Warn about unmapped headers
+      const unmappedHeaders = actualHeaders.filter(h => !headerMap[h]);
+      if (unmappedHeaders.length > 0) {
+        alert('Warning: The following columns are not recognized and will be ignored: ' + unmappedHeaders.join(', '));
+      }
 
-      const importData = validData.map(product => {
+
+      // Pre-validate and clean data
+      const requiredFields = ['productName', 'item', 'materialCost', 'weightPerUnit', 'currentSellingPrice', 'hourlyProduction'];
+      const importData = [];
+      const skippedRows = [];
+      validData.forEach((product, idx) => {
         const cleanedProduct = {};
         Object.keys(product).forEach(key => {
           const normalizedKey = key.toLowerCase().replace(/\s+/g, '').replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9]/g, '');
           const mappedKey = headerMap[normalizedKey] || normalizedKey;
           cleanedProduct[mappedKey] = product[key];
         });
-
         if (!cleanedProduct.unit) {
           cleanedProduct.unit = 'grams';
         }
@@ -312,9 +324,26 @@ function Reports({ products, darkMode }) {
         if (!cleanedProduct.masterBatchCost) {
           cleanedProduct.masterBatchCost = 0;
         }
-
-        return cleanedProduct;
+        // Pre-validate required fields and types
+        let missing = [];
+        requiredFields.forEach(f => {
+          if (!cleanedProduct[f] || cleanedProduct[f] === '' || cleanedProduct[f] === null) missing.push(f);
+        });
+        if (parseFloat(cleanedProduct.weightPerUnit) <= 0) missing.push('weightPerUnit');
+        if (parseFloat(cleanedProduct.materialCost) <= 0) missing.push('materialCost');
+        if (parseFloat(cleanedProduct.currentSellingPrice) <= 0) missing.push('currentSellingPrice');
+        if (parseFloat(cleanedProduct.hourlyProduction) <= 0) missing.push('hourlyProduction');
+        if (missing.length > 0) {
+          skippedRows.push({ row: idx + 2, reason: 'Missing or invalid: ' + missing.join(', ') });
+        } else {
+          importData.push(cleanedProduct);
+        }
       });
+
+      if (importData.length === 0) {
+        setError('No valid rows to import. Skipped rows: ' + skippedRows.map(r => `Row ${r.row} (${r.reason})`).join('; '));
+        return;
+      }
 
       const response = await fetch('http://localhost:5000/api/products/import', {
         method: 'POST',
@@ -324,14 +353,18 @@ function Reports({ products, darkMode }) {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Failed to import: ${errorText || 'Server error'}`);
+        setError(`Import failed: ${errorText}`);
+        return;
       }
 
-      setError('Products imported successfully');
+      let summary = `Products imported successfully: ${importData.length}`;
+      if (skippedRows.length > 0) {
+        summary += `. Skipped rows: ` + skippedRows.map(r => `Row ${r.row} (${r.reason})`).join('; ');
+      }
+      setError(summary);
       setSelectedFile(null);
       document.getElementById('fileInput').value = '';
     } catch (err) {
-      console.error('Import error:', err.message);
       setError(`Import failed: ${err.message}`);
     }
   };
@@ -351,6 +384,46 @@ function Reports({ products, darkMode }) {
     } catch (err) {
       setError('Failed to delete product');
     }
+  };
+
+  // Helper function to recalculate metrics for a single product (same as Inputs.js)
+  const recalcMetrics = (product) => {
+    const materialCost = parseFloat(product.materialCost) || 0;
+    const masterBatchCost = parseFloat(product.masterBatchCost) || 0;
+    const weightPerUnit = parseFloat(product.weightPerUnit) || 1;
+    const currentSellingPrice = parseFloat(product.currentSellingPrice) || 0;
+    const overheadPercentage = parseFloat(product.overheadPercentage) || 25;
+    const materialPricePerKg = materialCost / 25;
+    const totalMaterial = materialCost + masterBatchCost;
+    const minimumProduction = 25000 / weightPerUnit;
+    const costPerItem = totalMaterial / minimumProduction;
+    const overheadRate = overheadPercentage / 100;
+    const overheads = costPerItem * overheadRate;
+    const profitMargin = (costPerItem + overheads) * 0.10;
+    const sellingPriceExclusive = costPerItem + overheads + profitMargin;
+    const vat = sellingPriceExclusive * 0.16;
+    const proposedSellingPrice = sellingPriceExclusive + vat;
+    const pcsFrom1Kg = 1000 / weightPerUnit;
+    const valueOfProductFrom1Kg = currentSellingPrice * pcsFrom1Kg;
+    const currentMargin = (currentSellingPrice - costPerItem * 1.16) / (currentSellingPrice || 1);
+    const profitMarginPerKg = valueOfProductFrom1Kg - materialPricePerKg;
+    let suggestedSellingPrice = null;
+    if (currentMargin < 0.2) {
+      suggestedSellingPrice = (costPerItem * 1.16) / 0.8;
+    }
+    return {
+      costPerItem,
+      overheads,
+      profitMargin,
+      sellingPriceExclusive,
+      vat,
+      proposedSellingPrice,
+      currentMargin,
+      pcsFrom1Kg,
+      valueOfProductFrom1Kg,
+      profitMarginPerKg,
+      suggestedSellingPrice,
+    };
   };
 
   const inputClasses = `
@@ -554,62 +627,39 @@ function Reports({ products, darkMode }) {
             </tr>
           </thead>
           <tbody>
-              {filteredProducts.map((product) => (
-                <tr key={product._id} className={`border-t ${
-                  darkMode ? 'border-gray-700' : 'border-gray-200'
-                }`}>
-                  <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {product.productName}
-                  </td>
-                  <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {product.item}
-                  </td>
-                  <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {parseFloat(product.materialCost).toFixed(2)} KES
-                  </td>
-                  <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {parseFloat(product.weightPerUnit).toFixed(3)} {product.unit}
-                  </td>
-                  <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {product.calculations.costPerItem.toFixed(2)} KES
-                  </td>
-                  <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {product.calculations.overheads.toFixed(2)} KES
-                  </td>
-                  <td className={`p-4 ${
-                    product.calculations.currentMargin < 0.2
-                      ? 'text-red-500'
-                      : 'text-green-500'
+              {filteredProducts.map((product) => {
+                const calc = recalcMetrics(product);
+                return (
+                  <tr key={product._id} className={`border-t ${
+                    darkMode ? 'border-gray-700' : 'border-gray-200'
                   }`}>
-                    {(product.calculations.currentMargin * 100).toFixed(2)}%
-                  </td>
-                  <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {product.calculations.proposedSellingPrice.toFixed(2)} KES
-                  </td>
-                  <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {product.calculations.suggestedSellingPrice
-                      ? product.calculations.suggestedSellingPrice.toFixed(2) + ' KES'
-                      : '-'}
-                  </td>
-                  <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                    {product.calculations.profitMarginPerKg.toFixed(2)} KES
-                  </td>
-                  <td className="p-4 flex gap-2">
-                    <button
-                      onClick={() => handleEdit(product)}
-                      className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product._id)}
-                      className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition"
-                    >
-                      Delete
-                    </button>
-                  </td>
-              </tr>
-            ))}
+                    <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{product.productName}</td>
+                    <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{product.item}</td>
+                    <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{parseFloat(product.materialCost).toFixed(2)} KES</td>
+                    <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{parseFloat(product.weightPerUnit).toFixed(3)} {product.unit}</td>
+                    <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{calc.costPerItem.toFixed(2)} KES</td>
+                    <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{calc.overheads.toFixed(2)} KES</td>
+                    <td className={`p-4 ${calc.currentMargin < 0.2 ? 'text-red-500' : 'text-green-500'}`}>{(calc.currentMargin * 100).toFixed(2)}%</td>
+                    <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{calc.proposedSellingPrice.toFixed(2)} KES</td>
+                    <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{calc.suggestedSellingPrice ? calc.suggestedSellingPrice.toFixed(2) + ' KES' : '-'}</td>
+                    <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{calc.profitMarginPerKg.toFixed(2)} KES</td>
+                    <td className="p-4 flex gap-2">
+                      <button
+                        onClick={() => handleEdit(product)}
+                        className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product._id)}
+                        className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
       </div>
