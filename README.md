@@ -1,11 +1,8 @@
 # Costify Web App
-
 A full-stack web application for managing and analyzing cost inputs and output expectations within a company setup. Ideal for manufacturing and production environments, Costify helps you track material costs, generate reports, raise alerts, and visualize profit margins with ease.
 
 ---
-
 ## 🧾 Table of Contents
-
 * [Features](#features)
 * [Tech Stack](#tech-stack)
 * [Installation](#installation)
@@ -17,10 +14,7 @@ A full-stack web application for managing and analyzing cost inputs and output e
 * [Contributors](#contributors)
 * [License](#license)
 
----
-
 ## 🚀 Features
-
 * **Material Cost Entry**: Add materials, costs, and quantities.
 * **Dynamic Calculations**: Automatically updates margins and total costs.
 * **Real-time Alerts**: Notifies when costs spike or margins decrease.
@@ -61,8 +55,8 @@ A full-stack web application for managing and analyzing cost inputs and output e
 Clone the repository and install dependencies for both the frontend and backend.
 
 ```bash
-git clone https://github.com/yourusername/costify.git
-cd costify
+git clone https://github.com/lemonhead-ai/costing-analysis.git
+cd costing-analysis
 ```
 
 Install backend dependencies:
@@ -84,7 +78,6 @@ npm install
 ## ▶️ Usage
 
 ### Start Backend Server (Express)
-
 ```bash
 cd backend
 npm run dev
@@ -104,30 +97,6 @@ npm start
 * Open `http://localhost:3000` in your browser.
 
 ---
-
-## 📁 Folder Structure
-
-```
-plastify-costing-app/
-├── backend/              # Express backend
-│   ├── routes/           # API routes (e.g., products)
-│   ├── models/           # Mongoose schemas
-│   └── server.js         # Entry point for backend
-│
-├── src/                  # React frontend
-│   ├── components/       # Reusable UI components
-│   ├── pages/            # Views like Dashboard, Reports
-│   ├── App.js            # Main application component
-│   └── index.js          # React DOM entry point
-│
-├── public/               # Static assets
-├── .env                  # Environment variables (not tracked in git)
-├── README.md             # Project documentation
-└── package.json          # Scripts and metadata
-```
-
----
-
 ## 🔐 Environment Variables
 
 Create a `.env` file in the `backend/` directory with the following:
@@ -153,20 +122,16 @@ PORT=5000
 ---
 
 ## 📈 Coming Soon
-
 * 🔐 **User Authentication** (Admin/User roles)
 * 🔔 **Notification System**
 * 📊 **Advanced Analytics Dashboard**
 * 📱 **Mobile-Friendly Enhancements**
 
 ---
-
 ## 👥 Contributors
-
 Built with passion by **Lemonhead** and **Team Costify**.
 
 ---
 
 ## 📄 License
-
 This project is licensed under the [MIT License](LICENSE).
