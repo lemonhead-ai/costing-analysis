@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Costify",
+  "name": "web app",
+  "description": "A web app for tracking expenses and income.",
   "icons": [
     {
       "src": "favicon.ico",

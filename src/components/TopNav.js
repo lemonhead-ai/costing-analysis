@@ -464,7 +464,7 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
         <motion.div
           className="flex items-center flex-1 gap-4"
           animate={searchBarFocused ? { x: -40 } : { x: 0 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 20, duration: 0.5 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 20, duration: 0.1 }}
         >
           <h2 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Costify</h2>
           <div className="relative flex-1 flex justify-center" ref={searchRef}>
