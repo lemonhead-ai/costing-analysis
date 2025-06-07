@@ -105,7 +105,6 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
     if (onSearch) onSearch(product.productName);
   };
 
-  // Updated recalcMetrics (matches Alerts.js)
   const recalcMetrics = (product) => {
     const materialCost = parseFloat(product.materialCost) || 0;
     const masterBatchCost = parseFloat(product.masterBatchCost) || 0;
@@ -219,13 +218,13 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
 
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, 'Costing_Analysis_Report.xlsx');
+    saveAs(blob, 'Costing Report.xlsx');
   };
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF('landscape');
     doc.setFontSize(16);
-    doc.text('Plastify Costing Analysis Report', 14, 20);
+    doc.text('Costing Analysis Report', 14, 20);
 
     const tableColumns = [
       'Product Name',
@@ -310,7 +309,7 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
       },
     });
 
-    doc.save('Costing_Analysis_Report.pdf');
+    doc.save('Costing Report.pdf');
   };
 
   // Helper: Render overlay and results below the TopNav search box
@@ -330,10 +329,10 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
-        className="absolute left-0 right-0 top-full mt-2 z-[101] bg-white/70 dark:bg-gray-900/70 backdrop-blur-md"
+        className="absolute left-0 right-0 top-full mt-2 z-[101] dark:bg-gray-900/70 backdrop-filter backdrop-blur-30"
         style={{ pointerEvents: 'auto' }}
       >
-        <div className={`${darkMode ? 'bg-gray-900' : 'bg-white'} rounded-xl shadow-lg border border-gray-200 max-h-[60vh] overflow-y-auto`}> 
+        <div className={`${darkMode ? 'bg-gray-900' : 'bg-white'} rounded-2xl shadow-lg border max-h-[60vh] overflow-y-auto`}> 
           <div className="p-2">
             {searchResults.length === 0 && (
               <div className="text-gray-400 text-center py-6">No results found.</div>
@@ -455,44 +454,84 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
   return (
     <>
       <motion.div
-        className={`w-full px-8 py-3 flex justify-between items-center z-20 relative bg-transparent border-none shadow-none backdrop-blur-md`}
+        className={`w-full px-8 py-3 flex items-center z-20 relative bg-transparent border-none shadow-none backdrop-blur-md`}
         initial={false}
-        animate={searchBarFocused ? {
-          x: 0,
-        } : { x: 0 }}
       >
+        {/* Left section - Costify title */}
         <motion.div
-          className="flex items-center flex-1 gap-4"
-          animate={searchBarFocused ? { x: -40 } : { x: 0 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 20, duration: 0.1 }}
+          className="flex-shrink-0"
+          animate={searchBarFocused ? { 
+            x: -30,
+            scale: 0.8 
+          } : { 
+            x: 0,
+            scale: 1,
+            backdropFilter: 'blur(50px)'
+          }}
+          transition={{ 
+            type: 'spring', 
+            stiffness: 300, 
+            damping: 10,
+            mass: 0.8
+          }}
         >
-          <h2 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Costify</h2>
-          <div className="relative flex-1 flex justify-center" ref={searchRef}>
+          <h2 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Costify
+          </h2>
+        </motion.div>
+
+        {/* Center section - Search bar */}
+        <div className="flex-1 flex justify-center px-8">
+          <div className="relative w-full max-w-md" ref={searchRef}>
             <motion.input
-              style={{ maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto' }}
               type="text"
               placeholder="Search reports..."
               value={searchTerm}
               onChange={handleSearch}
               onFocus={() => setSearchBarFocused(true)}
-              onBlur={() => setTimeout(() => setSearchBarFocused(false), 300)}
-              className={`w-full px-5 py-2 rounded-full border focus:outline-none focus:ring-2 transition-all duration-200 text-base font-medium ${
+              onBlur={() => setTimeout(() => setSearchBarFocused(false), 400)}
+              className={`w-full px-5 py-2 rounded-full border focus:outline-none text-base font-medium ${
                 darkMode
-                  ? 'bg-gray-800 border-gray-700 text-gray-100 focus:border-green-500 focus:ring-green-200'
-                  : 'bg-white border-gray-300 text-gray-900 focus:border-green-600 focus:ring-green-100'
+                  ? 'bg-gray-800 border-gray-700 text-gray-100 focus:border-green-500'
+                  : 'bg-white border-gray-300 text-gray-900 focus:border-green-600'
               }`}
-              animate={searchBarFocused ? { scale: 1.08 } : { scale: 1 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 15, duration: 0.4 }}
+              animate={searchBarFocused ? { 
+                width: '140%',
+                x: '-14.3%' // This centers the expanded input
+              } : { 
+                width: '100%',
+                x: '0%'
+              }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 300, 
+                damping: 10,
+                mass: 0.8
+              }}
             />
             <AnimatePresence>
               {showResults && renderSearchOverlay()}
             </AnimatePresence>
           </div>
-        </motion.div>
+        </div>
+
+        {/* Right section - Icons */}
         <motion.div
-          className="flex items-center space-x-4 ml-4"
-          animate={searchBarFocused ? { x: 40 } : { x: 0 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 20, duration: 0.5 }}
+          className="flex items-center space-x-4 flex-shrink-0"
+          animate={searchBarFocused ? { 
+            x: 30,
+            scale: 0.8 
+          } : { 
+            x: 0,
+            scale: 1,
+            backdropFilter: 'blur(50px)'
+          }}
+          transition={{ 
+            type: 'spring', 
+            stiffness: 300, 
+            damping: 10,
+            mass: 0.8
+          }}
         >
           <div className="relative" ref={downloadRef}>
             {/* Download Button and Overlay */}
