@@ -1,7 +1,6 @@
 {
   "name": "costing-analysis",
   "version": "0.1.0",
-  "homepage": "https://lemonhead.github.io/costing-analysis/",
   "private": true,
   "dependencies": {
     "@heroicons/react": "^1.0.6",

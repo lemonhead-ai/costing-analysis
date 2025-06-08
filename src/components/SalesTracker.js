@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Calendar, TrendingUp, Package, UserCircle2, ListFilter, ShoppingBag, UserCircle } from 'lucide-react';
+import { Calendar, TrendingUp, Package, ListFilter, ShoppingBag, UserCircle } from 'lucide-react';
 
 const PRODUCTS = [
   'Hangers grade 2',
@@ -30,6 +30,7 @@ const SalesTracker = ({ darkMode }) => {
     date: new Date().toISOString().split('T')[0],
     product: '',
     quantity: '',
+    customer: '',
   });
   const [filterDate, setFilterDate] = useState({
     start: new Date().toISOString().split('T')[0],
@@ -49,6 +50,26 @@ const SalesTracker = ({ darkMode }) => {
       clearInterval(timer); // Clean up the interval on component unmount
     };
   }, []); // Empty dependency array means this effect runs once on mount and cleans up on unmount
+
+  // Helper function for SVG arc path generation
+  const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
+    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+    return {
+      x: centerX + (radius * Math.cos(angleInRadians)),
+      y: centerY + (radius * Math.sin(angleInRadians))
+    };
+  };
+
+  const describeArc = (x, y, radius, startAngle, endAngle) => {
+    const start = polarToCartesian(x, y, radius, endAngle);
+    const end = polarToCartesian(x, y, radius, startAngle);
+    const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
+    const d = [
+      'M', start.x, start.y,
+      'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y
+    ].join(' ');
+    return d;
+  };
 
   // Helper function to get dates based on filter
   const getDateRange = (filter) => {
@@ -132,7 +153,8 @@ const SalesTracker = ({ darkMode }) => {
       id: Date.now(),
       ...formData,
       quantity: parseInt(formData.quantity),
-      date: formData.date 
+      date: formData.date,
+      customer: formData.customer || 'Guest',
     };
 
     setSalesData(prev => [...prev, newSale]);
@@ -140,6 +162,7 @@ const SalesTracker = ({ darkMode }) => {
       date: new Date().toISOString().split('T')[0],
       product: '',
       quantity: '',
+      customer: '',
     });
   };
 
@@ -224,7 +247,7 @@ const SalesTracker = ({ darkMode }) => {
     const sortedProductsCurrentPeriod = Object.entries(productQuantitiesCurrentPeriod)
       .sort(([, qtyA], [, qtyB]) => qtyB - qtyA)
       .slice(0, 3);
-
+    
     // Calculate previous period dates for percentage comparison
     const periodLength = endDate.getTime() - startDate.getTime();
     const previousStartDate = new Date(startDate.getTime() - periodLength);
@@ -278,9 +301,6 @@ const SalesTracker = ({ darkMode }) => {
     };
   }, [salesData, productStatsFilter]);
 
-  // Placeholder for total sales value (e.g., average price per unit)
-  const averageProductPrice = 12.5; // Example average price per unit
-  const totalSalesValue = (filteredSalesForStats.reduce((sum, sale) => sum + sale.quantity, 0) * averageProductPrice).toFixed(3);
 
   return (
     <div className="p-6 space-y-6">
@@ -487,7 +507,7 @@ const SalesTracker = ({ darkMode }) => {
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">New customers in selected period</p>
             </div>
           </motion.div>
-          
+
           {/* Total Sold Products Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -592,7 +612,7 @@ const SalesTracker = ({ darkMode }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 flex flex-col h-full"
+            className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 flex flex-col h-full justify-between"
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Product Statistics</h3>
@@ -604,13 +624,13 @@ const SalesTracker = ({ darkMode }) => {
                 >
                   <option value="Today">Today</option>
                   <option value="Yesterday">Yesterday</option>
-                  <option value="Last Week">Last Week</option>
                   <option value="This Week">This Week</option>
-                  <option value="Last Month">Last Month</option>
+                  <option value="Last Week">Last Week</option>
                   <option value="This Month">This Month</option>
+                  <option value="Last Month">Last Month</option>
                   <option value="Last 6 Months">Last 6 Months</option>
-                  <option value="Last Year">Last Year</option>
                   <option value="This Year">This Year</option>
+                  <option value="Last Year">Last Year</option>
                   <option value="All Time">All Time</option>
                   <option value="Custom Period">Custom Period</option>
                 </select>
@@ -623,57 +643,51 @@ const SalesTracker = ({ darkMode }) => {
               <div className="relative w-48 h-48 flex items-center justify-center mb-4">
                 <svg className="w-full h-full" viewBox="0 0 120 120">
                   {/* Background 3/4 circle for 100% total sales */}
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="50"
+                  <path
+                    d={describeArc(60, 60, 50, 135, 405)} // Start 135, end 405 (135 + 270) for 3/4 circle
                     fill="none"
-                    stroke={darkMode ? '#374151' : '#E5E7EB'} // Light gray for background
+                    stroke="#E5E7EB" // Light gray for background
                     strokeWidth="10"
-                    strokeDasharray="235.619 78.54" // 3/4 of 2 * PI * 50
                     strokeLinecap="round"
-                    transform="rotate(-45 60 60)" // Rotate to start at the right position
                   />
-
-                  {/* Top 3 Product Arcs */}
+                  
+                  {/* Arcs for top 3 products */}
                   {productStatistics.data.map((entry, index) => {
-                    // Calculate circumference for each circle (r values are 50, 35, 20)
-                    // Arc starts from 135 degrees (relative to the background arc start) and goes clockwise
-                    // Each arc represents percentage of total quantity current period, not total top 3
-                    const radius = [50, 35, 20][index]; // Different radius for each circle
-                    const circumference = 2 * Math.PI * radius;
-                    
-                    // Percentage of total quantity sold in the current period
-                    const percentageOfTotal = productStatistics.totalQuantityCurrentPeriod > 0
-                      ? (entry.value / productStatistics.totalQuantityCurrentPeriod)
-                      : 0;
+                    const total = productStatistics.totalQuantityCurrentPeriod;
+                    const percentageOfTotal = total > 0 ? (entry.value / total) : 0;
 
-                    // For 3/4 circle, max dash is 235.619 (0.75 * circumference)
-                    const dash = percentageOfTotal * (0.75 * circumference);
-                    const gap = (0.75 * circumference) - dash;
+                    let arcRadius = 50; // Radius for the outermost arc
+                    let arcStrokeWidth = 10; // Stroke width for the outermost arc
+
+                    // Adjust radius and stroke width for nested arcs
+                    if (index === 0) { arcRadius = 50; arcStrokeWidth = 10; } // Outermost
+                    else if (index === 1) { arcRadius = 35; arcStrokeWidth = 8; } // Middle
+                    else if (index === 2) { arcRadius = 20; arcStrokeWidth = 6; } // Innermost
+
+                    // Total angle for 3/4 circle is 270 degrees. Percentage of this total angle.
+                    const totalAngle = 270; 
+                    // Start from 135 degrees (top-left) and sweep for the calculated percentage
+                    const startArcAngle = 135;
+                    const endArcAngle = startArcAngle + (percentageOfTotal * totalAngle);
 
                     return (
-                      <circle
-                        key={`arc-${index}`}
-                        cx="60"
-                        cy="60"
-                        r={radius}
+                      <path
+                        key={entry.name}
+                        d={describeArc(60, 60, arcRadius, startArcAngle, endArcAngle)}
                         fill="none"
                         stroke={entry.fill}
-                        strokeWidth={[10, 8, 6][index]} // Different stroke width for each circle
-                        strokeDasharray={`${dash} ${gap}`}
+                        strokeWidth={arcStrokeWidth}
                         strokeLinecap="round"
-                        transform="rotate(-45 60 60)" // Same rotation as background
                       />
                     );
                   })}
                 </svg>
-                {/* Central text displaying total quantity of products sold in current period */}
+                {/* Central text displaying total quantity of top products */}
                 <div className="absolute flex flex-col items-center justify-center">
                   <p className="text-3xl font-semibold text-gray-900 dark:text-white">{productStatistics.totalQuantityCurrentPeriod.toLocaleString()}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Products Sales</p>
                   <span className={`text-xs font-medium px-2 py-1 rounded-full mt-1 ${productStatistics.overallPercentageChange >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {`${productStatistics.overallPercentageChange >= 0 ? '+' : ''}${productStatistics.overallPercentageChange}%`}
+                    {productStatistics.overallPercentageChange >= 0 ? '+' : ''}{productStatistics.overallPercentageChange}%
                   </span>
                 </div>
               </div>
@@ -685,8 +699,9 @@ const SalesTracker = ({ darkMode }) => {
                       {entry.name}
                     </div>
                     <span className="font-medium">
-                      {entry.value.toLocaleString()} <span className={`text-xs ml-1 font-normal ${entry.percentageChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                        {`${entry.percentageChange >= 0 ? '+' : ''}${entry.percentageChange}%`}
+                      {entry.value.toLocaleString()} 
+                      <span className={`ml-1 font-normal text-xs ${entry.percentageChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        {entry.percentageChange >= 0 ? '+' : ''}{entry.percentageChange}%
                       </span>
                     </span>
                   </div>
@@ -704,7 +719,7 @@ const SalesTracker = ({ darkMode }) => {
         className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Date
@@ -753,6 +768,23 @@ const SalesTracker = ({ darkMode }) => {
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
                 />
                 <TrendingUp className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              </div>
+            </div>
+            {/* New Customer Input Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Customer Name
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="customer"
+                  value={formData.customer}
+                  onChange={handleInputChange}
+                  placeholder="Enter customer name"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+                />
+                <UserCircle className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
               </div>
             </div>
           </div>

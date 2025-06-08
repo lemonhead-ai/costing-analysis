@@ -38,7 +38,7 @@ const Sidebar = ({ darkMode, sidebarOpen, setSidebarOpen }) => {
       <div className={`flex flex-col items-start p-4`}>
         <div className="flex items-center w-full">
           <motion.img
-            src="/logo.png"
+            src={process.env.PUBLIC_URL + "/logo.png"}
             alt="Logo"
             className={sidebarOpen ? "h-10 w-10 object-contain rounded-full" : "h-8 w-8 object-contain rounded-full"}
             whileHover={{ scale: 1.03 }}
