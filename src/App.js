@@ -6,6 +6,7 @@ import Reports from './components/Reports';
 import Alerts from './components/Alerts';
 import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
+import SalesTracker from './components/SalesTracker';
 import { motion } from 'framer-motion';
 
 function App() {
@@ -89,6 +90,7 @@ function App() {
               <Route path="/inputs" element={<Inputs addProduct={addProduct} darkMode={darkMode} fetchProducts={fetchProducts} />} />
               <Route path="/reports" element={<Reports products={filteredProducts} darkMode={darkMode} />} />
               <Route path="/alerts" element={<Alerts darkMode={darkMode} />} />
+              <Route path="/sales" element={<SalesTracker darkMode={darkMode} />} />
             </Routes>
           </main>
         </motion.div>

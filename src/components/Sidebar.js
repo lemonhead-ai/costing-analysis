@@ -17,7 +17,7 @@ const Sidebar = ({ darkMode, sidebarOpen, setSidebarOpen }) => {
     { to: '/inputs', icon: <CiKeyboard className="h-6 w-6 mr-0.0125 ml-3 text-xl text-green-600" />, label: 'Inputs' },
     { to: '/reports', icon: <CiMemoPad className="h-6 w-6 mr-0.0125 ml-3 text-xl text-green-600" />, label: 'Reports' },
     { to: '/alerts', icon: <CiBellOn className="h-6 w-7 mr-0.0125 ml-3 text-xl text-green-600" />, label: 'Alerts' },
-    { to: '/Sales', icon: <CiDollar className="h-6 w-7 mr-0.0125 ml-3 text-xl text-green-600" />, label: 'Sales Tracker' },
+    { to: '/sales', icon: <CiDollar className="h-6 w-7 mr-0.0125 ml-3 text-xl text-green-600" />, label: 'Sales Tracker' },
     { to: '/Maintenance', icon: <CiHardDrive className="h-6 w-7 mr-0.0125 ml-3 text-xl text-green-600" />, label: 'Maintenance' },
   ];
 
