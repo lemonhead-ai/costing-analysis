@@ -108,60 +108,76 @@ const SalesTracker = ({ darkMode }) => {
 
   // Modify getDateRange to handle custom period
   const getDateRange = (filter) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     let startDate = new Date();
     let endDate = new Date();
+    
+    // Set end date to end of day (23:59:59.999)
     endDate.setHours(23, 59, 59, 999);
 
     switch (filter) {
       case 'Today':
-        startDate = today;
+        startDate = new Date(today);
+        endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
         break;
       case 'Yesterday':
+        startDate = new Date(today);
         startDate.setDate(today.getDate() - 1);
+        endDate = new Date(today);
         endDate.setDate(today.getDate() - 1);
+        endDate.setHours(23, 59, 59, 999);
         break;
       case 'Last Week':
+        startDate = new Date(today);
         startDate.setDate(today.getDate() - today.getDay() - 6); // Monday of last week
+        endDate = new Date(today);
         endDate.setDate(today.getDate() - today.getDay()); // Sunday of last week
+        endDate.setHours(23, 59, 59, 999);
         break;
       case 'This Week':
+        startDate = new Date(today);
         startDate.setDate(today.getDate() - today.getDay()); // Start of current week (Sunday)
-        endDate = new Date(); // Current date
+        endDate = new Date(now); // Current date and time
         break;
       case 'Last Month':
         startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+        endDate.setHours(23, 59, 59, 999);
         break;
       case 'This Month':
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1); // Start of current month
-        endDate = new Date(); // Current date
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        endDate = new Date(now); // Current date and time
         break;
       case 'Last 6 Months':
         startDate = new Date(today.getFullYear(), today.getMonth() - 6, 1);
-        endDate = new Date(today.getFullYear(), today.getMonth(), 0); // End of last month
+        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+        endDate.setHours(23, 59, 59, 999);
         break;
       case 'Last Year':
         startDate = new Date(today.getFullYear() - 1, 0, 1);
         endDate = new Date(today.getFullYear() - 1, 11, 31);
+        endDate.setHours(23, 59, 59, 999);
         break;
       case 'This Year':
-        startDate = new Date(today.getFullYear(), 0, 1); // Start of current year
-        endDate = new Date(); // Current date
+        startDate = new Date(today.getFullYear(), 0, 1);
+        endDate = new Date(now); // Current date and time
         break;
       case 'Custom Period':
-        // Use the values from filterDate state
         startDate = new Date(filterDate.start);
         endDate = new Date(filterDate.end);
+        endDate.setHours(23, 59, 59, 999);
         break;
       default:
-        startDate = today;
-        endDate = today;
+        startDate = new Date(today);
+        endDate = new Date(now); // Current date and time
         break;
     }
+
+    // Ensure start date is at beginning of day
     startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(23, 59, 59, 999);
+    
     return { startDate, endDate };
   };
 
