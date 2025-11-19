@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CiLight, CiDark, CiUser } from 'react-icons/ci';
 import { LuSettings } from 'react-icons/lu';
 import { GrPersonalComputer } from 'react-icons/gr';
+import { HiMenuAlt3 } from 'react-icons/hi';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
@@ -9,7 +10,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { HiOutlineDownload } from 'react-icons/hi';
 
-const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
+const TopNav = ({ darkMode, setDarkMode, onSearch, products, sidebarOpen, setSidebarOpen }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
@@ -83,7 +84,7 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
   const handleSearch = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
-    
+
     if (term.trim()) {
       const results = products.filter(
         (product) =>
@@ -332,7 +333,7 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
         className="absolute left-0 right-0 top-full mt-2 z-[101] dark:bg-gray-900/70 backdrop-filter backdrop-blur-30"
         style={{ pointerEvents: 'auto' }}
       >
-        <div className={`${darkMode ? 'bg-gray-900' : 'bg-white'} rounded-2xl shadow-lg border max-h-[60vh] overflow-y-auto`}> 
+        <div className={`${darkMode ? 'bg-gray-900' : 'bg-white'} rounded-2xl shadow-lg border max-h-[60vh] overflow-y-auto`}>
           <div className="p-2">
             {searchResults.length === 0 && (
               <div className="text-gray-400 text-center py-6">No results found.</div>
@@ -354,11 +355,10 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
                       <span className="text-gray-400">
                         Cost: {calc.costPerItem.toFixed(2)} KES
                       </span>
-                      <span className={`${
-                        calc.currentMargin < 0.2
+                      <span className={`${calc.currentMargin < 0.2
                           ? 'text-red-500'
                           : 'text-green-600'
-                      }`}>
+                        }`}>
                         Margin: {(calc.currentMargin * 100).toFixed(2)}%
                       </span>
                     </div>
@@ -454,23 +454,31 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
   return (
     <>
       <motion.div
-        className={`w-full px-8 py-3 flex items-center z-20 relative bg-transparent border-none shadow-none backdrop-blur-md`}
+        className={`w-full px-4 md:px-8 py-3 flex items-center z-20 relative bg-transparent border-none shadow-none backdrop-blur-md`}
         initial={false}
       >
+        {/* Hamburger Menu Button (Mobile Only) */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className={`md:hidden mr-3 p-2 rounded-lg ${darkMode ? 'text-white hover:bg-gray-800' : 'text-gray-900 hover:bg-gray-100'}`}
+        >
+          <HiMenuAlt3 className="h-6 w-6" />
+        </button>
+
         {/* Left section - Costify title */}
         <motion.div
-          className="flex-shrink-0"
-          animate={searchBarFocused ? { 
+          className="flex-shrink-0 hidden md:block"
+          animate={searchBarFocused ? {
             x: -30,
-            scale: 0.8 
-          } : { 
+            scale: 0.8
+          } : {
             x: 0,
             scale: 1,
             backdropFilter: 'blur(50px)'
           }}
-          transition={{ 
-            type: 'spring', 
-            stiffness: 300, 
+          transition={{
+            type: 'spring',
+            stiffness: 300,
             damping: 10,
             mass: 0.8
           }}
@@ -481,7 +489,7 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
         </motion.div>
 
         {/* Center section - Search bar */}
-        <div className="flex-1 flex justify-center px-8">
+        <div className="flex-1 flex justify-center px-2 md:px-8">
           <div className="relative w-full max-w-md" ref={searchRef}>
             <motion.input
               type="text"
@@ -490,21 +498,20 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
               onChange={handleSearch}
               onFocus={() => setSearchBarFocused(true)}
               onBlur={() => setTimeout(() => setSearchBarFocused(false), 400)}
-              className={`w-full px-5 py-2 rounded-full border focus:outline-none text-base font-medium ${
-                darkMode
+              className={`w-full px-3 md:px-5 py-2 rounded-full border focus:outline-none text-sm md:text-base font-medium ${darkMode
                   ? 'bg-gray-800 border-gray-700 text-gray-100 focus:border-green-500'
                   : 'bg-white border-gray-300 text-gray-900 focus:border-green-600'
-              }`}
-              animate={searchBarFocused ? { 
+                }`}
+              animate={searchBarFocused && window.innerWidth >= 768 ? {
                 width: '140%',
-                x: '-14.3%' // This centers the expanded input
-              } : { 
+                x: '-14.3%'
+              } : {
                 width: '100%',
                 x: '0%'
               }}
-              transition={{ 
-                type: 'spring', 
-                stiffness: 300, 
+              transition={{
+                type: 'spring',
+                stiffness: 300,
                 damping: 10,
                 mass: 0.8
               }}
@@ -517,18 +524,18 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
 
         {/* Right section - Icons */}
         <motion.div
-          className="flex items-center space-x-4 flex-shrink-0"
-          animate={searchBarFocused ? { 
+          className="flex items-center space-x-2 md:space-x-4 flex-shrink-0"
+          animate={searchBarFocused && window.innerWidth >= 768 ? {
             x: 30,
-            scale: 0.8 
-          } : { 
+            scale: 0.8
+          } : {
             x: 0,
             scale: 1,
             backdropFilter: 'blur(50px)'
           }}
-          transition={{ 
-            type: 'spring', 
-            stiffness: 300, 
+          transition={{
+            type: 'spring',
+            stiffness: 300,
             damping: 10,
             mass: 0.8
           }}
@@ -537,13 +544,13 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
             {/* Download Button and Overlay */}
             <motion.button
               onClick={() => { setDownloadOpen((v) => !v); setSettingsOpen(false); }}
-              className={`px-4 py-2 rounded-full font-semibold shadow-sm transition-colors duration-200 flex items-center gap-2 ${darkMode ? 'bg-gray-800 text-gray-200 hover:bg-gray-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              className={`px-2 md:px-4 py-2 rounded-full font-semibold shadow-sm transition-colors duration-200 flex items-center gap-1 md:gap-2 ${darkMode ? 'bg-gray-800 text-gray-200 hover:bg-gray-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
               title="Download"
             >
-              <HiOutlineDownload className="text-lg" />
+              <HiOutlineDownload className="text-base md:text-lg" />
             </motion.button>
             {downloadOpen && (
               <motion.div
@@ -642,9 +649,9 @@ const TopNav = ({ darkMode, setDarkMode, onSearch, products }) => {
             whileHover={{ scale: 1.1, rotate: 15 }}
             whileTap={{ scale: 0.9 }}
             transition={{ duration: 0.3 }}
-            className={`rounded-full p-2 ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}
+            className={`rounded-full p-1 md:p-2 ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}
           >
-            <CiUser className={`h-8 w-8 ${darkMode ? 'text-white' : 'text-gray-700'}`} />
+            <CiUser className={`h-6 w-6 md:h-8 md:w-8 ${darkMode ? 'text-white' : 'text-gray-700'}`} />
           </motion.div>
         </motion.div>
       </motion.div>

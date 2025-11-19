@@ -428,16 +428,16 @@ function Reports({ products, darkMode }) {
 
   const inputClasses = `
     w-full px-4 py-2 rounded-xl border transition-colors duration-200
-    ${darkMode 
-      ? 'bg-gray-900 border-gray-800 text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-200' 
+    ${darkMode
+      ? 'bg-gray-900 border-gray-800 text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-200'
       : 'bg-white border-gray-200 text-gray-900 focus:border-green-600 focus:ring-2 focus:ring-green-100'
     }
   `;
 
   const selectClasses = `
     px-4 py-2 rounded-xl border transition-colors duration-200
-    ${darkMode 
-      ? 'bg-gray-900 border-gray-800 text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-200' 
+    ${darkMode
+      ? 'bg-gray-900 border-gray-800 text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-200'
       : 'bg-white border-gray-200 text-gray-900 focus:border-green-600 focus:ring-2 focus:ring-green-100'
     }
   `;
@@ -461,19 +461,17 @@ function Reports({ products, darkMode }) {
       </h1>
 
       {error && (
-        <div className={`mb-6 p-4 rounded-xl border ${
-          darkMode 
-            ? 'bg-red-900 text-red-200 border-red-700' 
+        <div className={`mb-6 p-4 rounded-xl border ${darkMode
+            ? 'bg-red-900 text-red-200 border-red-700'
             : 'bg-red-100 text-red-700 border-red-300'
-        }`}>
+          }`}>
           {error}
         </div>
       )}
 
-      <div className={`p-6 rounded-xl ${
-        darkMode ? 'bg-gray-900' : 'bg-white'
-      } shadow-lg mb-6 border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className={`p-4 md:p-6 rounded-xl ${darkMode ? 'bg-gray-900' : 'bg-white'
+        } shadow-lg mb-6 border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
+        <div className="flex flex-col gap-4">
           <div className="flex-1">
             <input
               type="text"
@@ -483,156 +481,150 @@ function Reports({ products, darkMode }) {
               className={inputClasses}
             />
           </div>
-          <div className="flex-1">
-            <select
-              value={marginFilter}
-              onChange={handleMarginFilterChange}
-              className={selectClasses}
-            >
-              <option value="all">All Margins</option>
-              <option value="below20">Current Margin &lt; 20%</option>
-              <option value="above20">Current Margin ≥ 20%</option>
-            </select>
-          </div>
-          <div className="flex gap-2 items-center">
-            <input
-              type="file"
-              id="fileInput"
-              accept=".xlsx, .xls"
-              onChange={handleFileSelect}
-              className={inputClasses}
-            />
-            {selectedFile && (
-              <button
-                onClick={handleFileUpload}
-                className={buttonClasses(true)}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <select
+                value={marginFilter}
+                onChange={handleMarginFilterChange}
+                className={selectClasses}
               >
-                Import
+                <option value="all">All Margins</option>
+                <option value="below20">Current Margin &lt; 20%</option>
+                <option value="above20">Current Margin ≥ 20%</option>
+              </select>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <input
+                type="file"
+                id="fileInput"
+                accept=".xlsx, .xls"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <label
+                htmlFor="fileInput"
+                className={`${buttonClasses(false)} cursor-pointer text-sm md:text-base`}
+              >
+                Choose File
+              </label>
+              {selectedFile && (
+                <button
+                  onClick={handleFileUpload}
+                  className={`${buttonClasses(true)} text-sm md:text-base`}
+                >
+                  Import
+                </button>
+              )}
+              <button
+                onClick={handleDownloadReport}
+                className={`${buttonClasses(true)} text-sm md:text-base`}
+              >
+                <HiOutlineDownload className="text-base md:text-lg" /> Excel
               </button>
-            )}
-            <button
-              onClick={handleDownloadReport}
-              className={buttonClasses(true)}
-            >
-              <HiOutlineDownload className="text-lg" /> Excel
-            </button>
-            <button
-              onClick={handleDownloadPDF}
-              className={buttonClasses(true)}
-            >
-              <HiOutlineDownload className="text-lg" /> PDF
-            </button>
+              <button
+                onClick={handleDownloadPDF}
+                className={`${buttonClasses(true)} text-sm md:text-base`}
+              >
+                <HiOutlineDownload className="text-base md:text-lg" /> PDF
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {filteredProducts.length === 0 ? (
-        <div className={`p-6 rounded-xl ${
-          darkMode ? 'bg-gray-900' : 'bg-white'
-        } shadow-lg text-center border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
+        <div className={`p-6 rounded-xl ${darkMode ? 'bg-gray-900' : 'bg-white'
+          } shadow-lg text-center border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
           <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             No products match your search or filter criteria.
           </p>
         </div>
       ) : (
-        <div className={`overflow-x-auto rounded-xl ${
-          darkMode ? 'bg-gray-900' : 'bg-white'
-        } shadow-lg border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
+        <div className={`overflow-x-auto rounded-xl ${darkMode ? 'bg-gray-900' : 'bg-white'
+          } shadow-lg border ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
           <table className="w-full">
-          <thead>
-              <tr className={`${
-                darkMode ? 'bg-gray-700/50' : 'bg-gray-50'
-              }`}>
+            <thead>
+              <tr className={`${darkMode ? 'bg-gray-700/50' : 'bg-gray-50'
+                }`}>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('productName')}
                 >
                   Product {sortKey === 'productName' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('item')}
                 >
                   Item {sortKey === 'item' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('materialCost')}
                 >
                   Material Cost {sortKey === 'materialCost' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('weightPerUnit')}
                 >
                   Weight per Unit {sortKey === 'weightPerUnit' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('calculations.costPerItem')}
                 >
                   Cost per Item {sortKey === 'calculations.costPerItem' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('calculations.overheads')}
                 >
                   Overheads per Item {sortKey === 'calculations.overheads' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('calculations.currentMargin')}
                 >
                   Current Margin {sortKey === 'calculations.currentMargin' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('calculations.proposedSellingPrice')}
                 >
                   Proposed Selling Price {sortKey === 'calculations.proposedSellingPrice' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('calculations.suggestedSellingPrice')}
                 >
                   Suggested Selling Price {sortKey === 'calculations.suggestedSellingPrice' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
-                  className={`p-4 text-left font-medium ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
+                  className={`p-4 text-left font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                    } cursor-pointer hover:bg-opacity-75 transition-colors duration-200`}
                   onClick={() => handleSort('calculations.profitMarginPerKg')}
                 >
                   Profit Margin per KG {sortKey === 'calculations.profitMarginPerKg' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="p-4 text-left font-medium text-gray-300">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+              </tr>
+            </thead>
+            <tbody>
               {filteredProducts.map((product) => {
                 const calc = recalcMetrics(product);
                 return (
-                  <tr key={product._id} className={`border-t ${
-                    darkMode ? 'border-gray-700' : 'border-gray-200'
-                  }`}>
+                  <tr key={product._id} className={`border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'
+                    }`}>
                     <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{product.productName}</td>
                     <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{product.item}</td>
                     <td className={`p-4 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>{parseFloat(product.materialCost).toFixed(2)} KES</td>
@@ -660,9 +652,9 @@ function Reports({ products, darkMode }) {
                   </tr>
                 );
               })}
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

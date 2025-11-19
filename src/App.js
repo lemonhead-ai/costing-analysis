@@ -63,24 +63,22 @@ function App() {
     <Router>
       <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
         <Sidebar darkMode={darkMode} setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} />
-        <motion.div
-          className="flex-1 min-h-screen pl-10"
-          animate={{ marginLeft: sidebarOpen ? 256 : 64 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-        >
-          <TopNav 
-            darkMode={darkMode} 
-            setDarkMode={setDarkMode} 
-            onSearch={handleSearch} 
+        <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-16'
+          } ml-0`}>
+          <TopNav
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+            onSearch={handleSearch}
             products={products}
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
           />
-          <main className="p-6">
+          <main className="p-4 md:p-6">
             {error && (
-              <div className={`mb-4 p-4 rounded-lg ${
-                darkMode 
-                  ? 'bg-red-900/50 text-red-200 border border-red-700' 
+              <div className={`mb-4 p-4 rounded-lg ${darkMode
+                  ? 'bg-red-900/50 text-red-200 border border-red-700'
                   : 'bg-red-50 text-red-700 border border-red-200'
-              }`}>
+                }`}>
                 {error}
               </div>
             )}
@@ -93,7 +91,7 @@ function App() {
               <Route path="/sales" element={<SalesTracker darkMode={darkMode} />} />
             </Routes>
           </main>
-        </motion.div>
+        </div>
       </div>
     </Router>
   );
